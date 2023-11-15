@@ -1,45 +1,45 @@
-let canvasWidth = 600;
-let canvasHeight = 500;
-let spacialHash;
-let boids = [];
-let diameter = 10;
-let boidsCount = 1000;
-let useSpacialHash = true;
-let useBreak = true;
-let grid;
-let counter = 0;
-let log = true;
+// Constants for canvas dimensions
+const CANVAS_WIDTH = 600;
+const CANVAS_HEIGHT = 500;
+const MAX_BOIDS = 2000;
+const MIN_DIAMETER = 5;
+const MAX_DIAMETER = 50;
 
-let config = {
-  useSpacialHash: useSpacialHash,
-  boidsCount: boidsCount,
-  diameter: diameter,
-  useBreak: useBreak,
+// GUI Configuration
+const config = {
+  useSpacialHash: true,
+  boidsCount: 1000,
+  diameter: 10,
+  useBreak: true,
 };
 
+// GUI setup
 const gui = new dat.GUI();
-gui.add(config, "useSpacialHash").onChange((value) => {
-  useSpacialHash = value;
-  createSpacialHash();
-});
-gui.add(config, "useBreak").onChange((value) => {
-  useBreak = value;
-  createSpacialHash();
-});
-gui
-  .add(config, "boidsCount", 10, 2000)
-  .step(1)
-  .onChange((value) => {
-    boidsCount = value;
-    createSpacialHash();
-  });
-gui
-  .add(config, "diameter", 5, 50)
-  .step(1)
-  .onChange((value) => {
-    diameter = value;
-    createSpacialHash();
-  });
+gui.add(config, "useSpacialHash").onChange(reinitialize);
+gui.add(config, "useBreak").onChange(reinitialize);
+gui.add(config, "boidsCount", 10, MAX_BOIDS).step(1).onChange(reinitialize);
+gui.add(config, "diameter", MIN_DIAMETER, MAX_DIAMETER).step(1).onChange(reinitialize);
+
+// Simulation setup
+let boids = [];
+let spacialHash;
+let grid;
+
+function setup() {
+  createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+  reinitialize();
+}
+
+function reinitialize() {
+  boids = [];
+  spacialHash = new SpatialHash(CANVAS_WIDTH, CANVAS_HEIGHT, config.diameter);
+  for (let i = 0; i < config.boidsCount; i++) {
+    const boid = new Boid(random(CANVAS_WIDTH), random(CANVAS_HEIGHT), config.diameter);
+    boids.push(boid);
+    spacialHash.insert(boid);
+  }
+  grid = config.diameter;
+}
 
 function neighbors(arr, m, n) {
   // define what a neighbor is
@@ -61,23 +61,6 @@ function neighbors(arr, m, n) {
         h + m >= 0 && h + m < arr.length && j + n >= 0 && j + n < arr[0].length
     )
     .map(([h, j]) => arr[h + m][j + n]);
-}
-
-function setup() {
-  createCanvas(canvasWidth, canvasHeight);
-  createSpacialHash();
-}
-
-function createSpacialHash() {
-  boids = [];
-  spacialHash = [];
-  grid = diameter;
-  spacialHash = new SpatialHash({ w: canvasWidth, h: canvasHeight }, grid);
-  for (let a = 0; a < boidsCount; a++) {
-    let boid = new Boid(random(0, canvasWidth), random(0, canvasHeight));
-    boids.push(boid);
-    spacialHash.insert(boid);
-  }
 }
 
 function draw() {
@@ -110,7 +93,7 @@ function draw() {
         fill(255);
         //check overlay
 
-        if (useSpacialHash) {
+        if (config.useSpacialHash) {
           spacialHash.hashTable[a][b][c].checkOverlay(
             neighbors(spacialHash.hashTable, a, b)
           );
@@ -125,7 +108,7 @@ function draw() {
         circle(
           spacialHash.hashTable[a][b][c].x,
           spacialHash.hashTable[a][b][c].y,
-          diameter
+          config.diameter
         );
       }
     }
@@ -142,8 +125,8 @@ class Boid {
     this.x = x;
     this.y = y;
     this.direction = { x: Math.random() - 0.5, y: Math.random() - 0.5 };
-    this.w = canvasWidth;
-    this.h = canvasHeight;
+    this.w = CANVAS_WIDTH;
+    this.h = CANVAS_HEIGHT;
   }
   checkOverlay(parents) {
     parents = [].concat(...parents);
@@ -152,9 +135,9 @@ class Boid {
       let disx = parents[a].x - this.x;
       let disy = parents[a].y - this.y;
       if (disx != 0 && disy != 0) {
-        if (Math.hypot(disx, disy) < diameter) {
+        if (Math.hypot(disx, disy) < config.diameter) {
           fill(255, 0, 0);
-          if (useBreak) {
+          if (config.useBreak) {
             break;
           }
         }
@@ -171,24 +154,24 @@ class Boid {
     this.x += dx;
     this.y += dy;
     // Handle horizontal boundaries
-    if (this.x < diameter || this.x > w - diameter) {
+    if (this.x < config.diameter || this.x > w - config.diameter) {
       this.direction.x = -dx;
-      this.x = this.x < diameter ? diameter : w - diameter;
+      this.x = this.x < config.diameter ? config.diameter : w - config.diameter;
     }
     // Handle vertical boundaries
-    if (this.y < diameter || this.y > h - diameter) {
+    if (this.y < config.diameter || this.y > h - config.diameter) {
       this.direction.y = -dy;
-      this.y = this.y < diameter ? diameter : h - diameter;
+      this.y = this.y < config.diameter ? config.diameter : h - config.diameter;
     }
   }
 }
 
 class SpatialHash {
-  constructor(bounds, gridSize) {
+  constructor(w,h, gridSize) {
     this.gridSize = gridSize;
     this.hashTable = [];
-    this.horizontal = Math.ceil(bounds.w / gridSize);
-    this.vertical = Math.ceil(bounds.h / gridSize);
+    this.horizontal = Math.ceil(w / gridSize);
+    this.vertical = Math.ceil(h / gridSize);
     this.hashTable = Array.from({ length: this.vertical }, () =>
       Array.from({ length: this.horizontal }, () => [])
     );
