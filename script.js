@@ -1,26 +1,24 @@
 class SpatialHash {
   constructor(w,h, gridSize) {
-    this.gridSize = gridSize;
-    this.hashTable = [];
+    this.gridSize = gridSize;   
     this.horizontal = Math.ceil(w / gridSize);
     this.vertical = Math.ceil(h / gridSize);
     this.hashTable = Array.from({ length: this.vertical }, () =>
       Array.from({ length: this.horizontal }, () => [])
     );
-    this.occupiedCells = new Set();
+    this.occupiedCells = [];
   }
   clear() {
-    this.occupiedCells.forEach((cell) => {
-      let [a, b] = cell.split(",").map(Number);
-      this.hashTable[a][b] = [];
-    });
-    this.occupiedCells.clear();
+    for (const [yIndex, xIndex] of this.occupiedCells) {
+      this.hashTable[yIndex][xIndex].length = 0; // Clear the cell directly
+    }
+    this.occupiedCells.length = 0; // Clear the occupiedCells array
   }
   insert(object) {
     let xIndex = Math.floor(object.x / this.gridSize);
     let yIndex = Math.floor(object.y / this.gridSize);
     this.hashTable[yIndex][xIndex].push(object);
-    this.occupiedCells.add(`${yIndex},${xIndex}`);
+    this.occupiedCells.push([yIndex, xIndex]);
   }
 }
 class Boid {
