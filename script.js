@@ -5,10 +5,29 @@ let boids = [];
 let diameter = 20;
 let boidsCount = 50;
 let useSpacialHash = true;
-
-let grid = diameter;
+let grid;
 let counter = 0;
 let log = true;
+
+let config = {
+  useSpacialHash: true,
+  boidsCount: 50,
+  diameter: 20,
+}
+
+const gui = new dat.GUI();
+gui.add(config, 'useSpacialHash').onChange((value) => {
+  useSpacialHash = value;
+  createSpacialHash();
+});
+gui.add(config, 'boidsCount', 10, 1000).step(1).onChange((value) => {
+  boidsCount = value;
+  createSpacialHash();
+});
+gui.add(config, 'diameter', 10, 100).step(1).onChange((value) => {   
+  diameter = value;
+  createSpacialHash();
+});
 
 function neighbors(arr, m, n) {
   // define what a neighbor is
@@ -21,7 +40,7 @@ function neighbors(arr, m, n) {
     [0, 1],
     [1, -1],
     [1, 0],
-    [1, 1]
+    [1, 1],
   ];
   // filter edges & map
   return v
@@ -34,15 +53,25 @@ function neighbors(arr, m, n) {
 
 function setup() {
   createCanvas(canvasWidth, canvasHeight);
+  createSpacialHash();
+}
+
+
+function createSpacialHash() {
+  boids = [];
+  spacialHash = [];
+  grid = diameter;
   spacialHash = new SpatialHash({ w: canvasWidth, h: canvasHeight }, grid);
   for (let a = 0; a < boidsCount; a++) {
     let boid = new Boid(random(0, canvasWidth), random(0, canvasHeight));
     boids.push(boid);
     spacialHash.insert(boid);
   }
+ 
 }
 
 function draw() {
+  
   counter = 0;
   spacialHash.clear();
   for (let a = 0; a < boids.length; a++) {
@@ -120,7 +149,7 @@ class Boid {
         }
       }
     }
-  }   
+  }
   update() {
     // Cache properties for quicker access
     let dx = this.direction.x;
