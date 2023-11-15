@@ -217,7 +217,7 @@ function draw() {
   for (a = 0; a < spacialHash.hashTable.length; a++) {
     for (let b = 0; b < spacialHash.hashTable[a].length; b++) {
       for (let c = 0; c < spacialHash.hashTable[a][b].length; c++) {
-        fill(255);
+        fill(200);
         //check overlay
 
         if (config.useSpacialHash) {
