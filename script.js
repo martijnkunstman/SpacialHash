@@ -2,32 +2,44 @@ let canvasWidth = 600;
 let canvasHeight = 500;
 let spacialHash;
 let boids = [];
-let diameter = 20;
-let boidsCount = 50;
+let diameter = 10;
+let boidsCount = 1000;
 let useSpacialHash = true;
+let useBreak = true;
 let grid;
 let counter = 0;
 let log = true;
 
 let config = {
-  useSpacialHash: true,
-  boidsCount: 50,
-  diameter: 20,
-}
+  useSpacialHash: useSpacialHash,
+  boidsCount: boidsCount,
+  diameter: diameter,
+  useBreak: useBreak,
+};
 
 const gui = new dat.GUI();
-gui.add(config, 'useSpacialHash').onChange((value) => {
+gui.add(config, "useSpacialHash").onChange((value) => {
   useSpacialHash = value;
   createSpacialHash();
 });
-gui.add(config, 'boidsCount', 10, 1000).step(1).onChange((value) => {
-  boidsCount = value;
+gui.add(config, "useBreak").onChange((value) => {
+  useBreak = value;
   createSpacialHash();
 });
-gui.add(config, 'diameter', 10, 100).step(1).onChange((value) => {   
-  diameter = value;
-  createSpacialHash();
-});
+gui
+  .add(config, "boidsCount", 10, 2000)
+  .step(1)
+  .onChange((value) => {
+    boidsCount = value;
+    createSpacialHash();
+  });
+gui
+  .add(config, "diameter", 5, 50)
+  .step(1)
+  .onChange((value) => {
+    diameter = value;
+    createSpacialHash();
+  });
 
 function neighbors(arr, m, n) {
   // define what a neighbor is
@@ -56,7 +68,6 @@ function setup() {
   createSpacialHash();
 }
 
-
 function createSpacialHash() {
   boids = [];
   spacialHash = [];
@@ -67,11 +78,9 @@ function createSpacialHash() {
     boids.push(boid);
     spacialHash.insert(boid);
   }
- 
 }
 
 function draw() {
-  
   counter = 0;
   spacialHash.clear();
   for (let a = 0; a < boids.length; a++) {
@@ -122,10 +131,10 @@ function draw() {
     }
   }
   fill(200);
-  rect(0, 0, 200, 40);
+  rect(0, 0, 180, 30);
   fill(0, 0, 0);
-  textSize(32);
-  text(Math.round(frameRate()) + "-" + counter, 10, 30);
+  textSize(16);
+  text("fps:"+Math.round(frameRate()) + "- calc:" + counter, 10, 20);
 }
 
 class Boid {
@@ -145,7 +154,9 @@ class Boid {
       if (disx != 0 && disy != 0) {
         if (Math.hypot(disx, disy) < diameter) {
           fill(255, 0, 0);
-          break;
+          if (useBreak) {
+            break;
+          }
         }
       }
     }
