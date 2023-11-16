@@ -35,7 +35,7 @@ class Boid {
       counter++;
       let disx = parents[a].x - this.x;
       let disy = parents[a].y - this.y;
-      fill(200.200.200);
+      fill(200,200,200);
       if (disx != 0 && disy != 0) {
         if (Math.hypot(disx, disy) < config.diameter) {
           fill(255, 0, 0);
