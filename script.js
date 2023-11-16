@@ -35,7 +35,7 @@ class Boid {
       counter++;
       let disx = parents[a].x - this.x;
       let disy = parents[a].y - this.y;
-      fill(200,200,200);
+      fill(100,100,100);
       if (disx != 0 && disy != 0) {
         if (Math.hypot(disx, disy) < config.diameter) {
           fill(255, 0, 0);
@@ -119,10 +119,6 @@ function fill(r, g, b) {
   ctx.fillStyle = color;
 }
 
-function rect(x, y, w, h) {
-  ctx.fillRect(x, y, w, h);
-}
-
 function circle(x, y, diameter) {
   ctx.beginPath();
   ctx.arc(x, y, diameter / 2, 0, 2 * Math.PI);
@@ -203,17 +199,17 @@ function draw() {
   let xx = Math.floor(mouseX / grid);
   let yy = Math.floor(mouseY / grid);
   fill(255);
-  rect(xx * grid, yy * grid, grid, grid);
+  ctx.fillRect(xx * grid, yy * grid, grid, grid);
   //get all 8 border cells in grid...
   fill(200);
-  rect((xx - 1) * grid, (yy - 1) * grid, grid, grid);
-  rect((xx - 1) * grid, yy * grid, grid, grid);
-  rect((xx - 1) * grid, (yy + 1) * grid, grid, grid);
-  rect((xx + 1) * grid, (yy - 1) * grid, grid, grid);
-  rect((xx + 1) * grid, yy * grid, grid, grid);
-  rect((xx + 1) * grid, (yy + 1) * grid, grid, grid);
-  rect(xx * grid, (yy - 1) * grid, grid, grid);
-  rect(xx * grid, (yy + 1) * grid, grid, grid);
+  ctx.fillRect((xx - 1) * grid, (yy - 1) * grid, grid, grid);
+  ctx.fillRect((xx - 1) * grid, yy * grid, grid, grid);
+  ctx.fillRect((xx - 1) * grid, (yy + 1) * grid, grid, grid);
+  ctx.fillRect((xx + 1) * grid, (yy - 1) * grid, grid, grid);
+  ctx.fillRect((xx + 1) * grid, yy * grid, grid, grid);
+  ctx.fillRect((xx + 1) * grid, (yy + 1) * grid, grid, grid);
+  ctx.fillRect(xx * grid, (yy - 1) * grid, grid, grid);
+  ctx.fillRect(xx * grid, (yy + 1) * grid, grid, grid);
 
   for (a = 0; a < spacialHash.hashTable.length; a++) {
     for (let b = 0; b < spacialHash.hashTable[a].length; b++) {
@@ -239,10 +235,10 @@ function draw() {
           config.diameter
         );
       }
-    }
+    }``
   }
   fill(200);
-  rect(0, 0, 180, 30);
+  ctx.fillRect(0, 0, 180, 30);
   fill(0, 0, 0);
   textSize(16);
   text("fps:"+Math.round(frameRate()) + "- calc:" + counter, 10, 20);
