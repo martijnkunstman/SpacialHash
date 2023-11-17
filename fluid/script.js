@@ -1,7 +1,7 @@
-const CANVAS_WIDTH = 200;
-const CANVAS_HEIGHT = 200;
-const BOIDS_COUNT = 2000;
-const DIAMETER = 5;
+const CANVAS_WIDTH = 400;
+const CANVAS_HEIGHT = 400;
+const BOIDS_COUNT = 5000;
+const DIAMETER = 2;
 const GRAVITY = 0.005;
 const DAMPING = 0.995;
 const SEED = 123456;
@@ -10,6 +10,8 @@ const canvas = document.createElement("canvas");
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
 document.body.appendChild(canvas);
+
+let spacialHash = new SpatialHash(CANVAS_WIDTH, CANVAS_HEIGHT, DIAMETER);
 
 const ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = true;
@@ -31,11 +33,15 @@ function init() {
 }
 let imgData;
 function update() {
+  spacialHash.clear();
+  for (let i = 0; i < BOIDS_COUNT; i++) {
+    spacialHash.insert(boids[0 + i * 4], boids[1 + i * 4], i * 4);
+  }
   counter = 0;
   imgData = ctx.createImageData(CANVAS_WIDTH, CANVAS_HEIGHT);
-  for (let i = 0; i < boids.length / 4; i++) {
-    //
-    for (let j = 0; j < boids.length / 4; j++) {
+
+  for (let i = 0; i < BOIDS_COUNT; i++) {
+    for (let j = 0; j < BOIDS_COUNT; j++) {
       counter++;
       if (i == j) continue;
       let dx = boids[0 + i * 4] - boids[0 + j * 4];
@@ -48,13 +54,12 @@ function update() {
         dx /= len;
         dy /= len;
         //
-        boids[2 + i * 4] += (dx * influence) / 100;
-        boids[3 + i * 4] += (dy * influence) / 100;
+        boids[2 + i * 4] += (dx * influence) / 10;
+        boids[3 + i * 4] += (dy * influence) / 10;
       }
     }
-    //
   }
-  for (let i = 0; i < boids.length / 4; i++) {
+  for (let i = 0; i < BOIDS_COUNT; i++) {
     //render boids position
     boids[2 + i * 4] = boids[2 + i * 4] * DAMPING;
     boids[3 + i * 4] = boids[3 + i * 4] * DAMPING + GRAVITY;

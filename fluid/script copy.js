@@ -1,10 +1,10 @@
-const CANVAS_WIDTH = 800;
-const CANVAS_HEIGHT = 800;
+const CANVAS_WIDTH = 200;
+const CANVAS_HEIGHT = 200;
 const BOIDS_COUNT = 1000;
-const DIAMETER = 18;
-const GRAVITY = 0.004;
+const DIAMETER = 5;
+const GRAVITY = 0.005;
 const DAMPING = 0.995;
-const SEED = 123457;
+const SEED = 123456;
 
 const canvas = document.createElement("canvas");
 canvas.width = CANVAS_WIDTH;
@@ -48,7 +48,7 @@ class Vector {
   normalize() {
     let len = Math.sqrt(this.x * this.x + this.y * this.y);
     if (len < 0.00000000001) {
-      len = 0.00000000001;
+      //len = 0.00000000001;
     }
     this.x /= len;
     this.y /= len;
@@ -122,7 +122,7 @@ class Boid {
       let lift = (CANVAS_HEIGHT - this.y) / CANVAS_HEIGHT;
       this.direction.y -= (lift + 0.01) * 0.01; // Adjust the 0.05 value to control the strength of the lift
     }
-    
+    /*
     let gradient = ctx.createRadialGradient(
       this.x,
       this.y,
@@ -131,15 +131,16 @@ class Boid {
       this.y,
       DIAMETER
     );
+    */
 
-    gradient.addColorStop(0, "rgba(" + this.influence + ", 0, 0, 1)"); // Opaque center
-    gradient.addColorStop(1, "rgba(" + this.influence + ", 0, 0, 0)"); // Transparent edges
+    //gradient.addColorStop(0, "rgba(" + this.influence + ", 0, 0, 1)"); // Opaque center
+    //gradient.addColorStop(1, "rgba(" + this.influence + ", 0, 0, 0)"); // Transparent edges
 
     //ctx.fillStyle = "rgb(" + this.influence + ", 0, 0)";
     // Apply the gradient to the circle
-    ctx.fillStyle = gradient;
+    ctx.fillStyle = "rgba(255, 0, 0, 0.2)";
     ctx.beginPath();
-    ctx.arc(this.x, this.y, DIAMETER, 0, 2 * Math.PI);
+    ctx.arc(this.x, this.y, DIAMETER-DIAMETER/4, 0, 2 * Math.PI);
     ctx.fill();
   }
 }
