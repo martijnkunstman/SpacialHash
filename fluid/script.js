@@ -1,5 +1,5 @@
-const CANVAS_WIDTH = 800;
-const CANVAS_HEIGHT = 800;
+const CANVAS_WIDTH = 200;
+const CANVAS_HEIGHT = 200;
 const BOIDS_COUNT = 2000;
 const DIAMETER = 5;
 const GRAVITY = 0.005;
@@ -13,7 +13,6 @@ document.body.appendChild(canvas);
 
 const ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = true;
-
 
 const boids = new Float32Array(BOIDS_COUNT * 4);
 const debugDiv = document.querySelector("#debug");
@@ -39,13 +38,18 @@ function update() {
     for (let j = 0; j < boids.length / 4; j++) {
       counter++;
       if (i == j) continue;
-      let dx = boids[0 + i * 4] - boids[0 + j * 4]
-      let dy = boids[1 + i * 4] - boids[1 + j * 4]
+      let dx = boids[0 + i * 4] - boids[0 + j * 4];
+      let dy = boids[1 + i * 4] - boids[1 + j * 4];
       let d = Math.sqrt(dx * dx + dy * dy);
       if (d < DIAMETER * 2) {
-        let influence = 1 - (d / (DIAMETER * 2));
-        boids[2 + i * 4] += dx * influence / 100;
-        boids[3 + i * 4] += dy * influence / 100;
+        let influence = 1 - d / (DIAMETER * 2);
+        //
+        let len = Math.sqrt(dx * dx + dy * dy);
+        dx /= len;
+        dy /= len;
+        //
+        boids[2 + i * 4] += (dx * influence) / 100;
+        boids[3 + i * 4] += (dy * influence) / 100;
       }
     }
     //
@@ -65,7 +69,7 @@ function update() {
     ) {
       boids[2 + i * 4] = -boids[2 + i * 4];
       boids[0 + i * 4] =
-        boids[0 + i *4] < DIAMETER ? DIAMETER : CANVAS_WIDTH - DIAMETER;
+        boids[0 + i * 4] < DIAMETER ? DIAMETER : CANVAS_WIDTH - DIAMETER;
     }
     // Handle vertical boundaries
     if (
@@ -77,10 +81,6 @@ function update() {
         boids[1 + i * 4] < DIAMETER ? DIAMETER : CANVAS_HEIGHT - DIAMETER;
     }
 
-
-
-
-
     let x = Math.floor(boids[0 + i * 4]);
     let y = Math.floor(boids[1 + i * 4]);
     //imgData.data[(Math.floor(x) + Math.floor(y) * CANVAS_WIDTH) * 4] = 255;
@@ -89,7 +89,8 @@ function update() {
     imgData.data[(x + y * CANVAS_WIDTH) * 4 + 3] = 255;
   }
   ctx.putImageData(imgData, 0, 0);
-  debugDiv.innerHTML = "FPS: " + Math.round(frameRate()) + " - counter: " + counter;
+  debugDiv.innerHTML =
+    "FPS: " + Math.round(frameRate()) + " - counter: " + counter;
   requestAnimationFrame(update);
 }
 
