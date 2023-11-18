@@ -42,8 +42,7 @@ function update() {
     spacialHash.clear();
     for (let i = 0; i < BOIDS_COUNT; i++) {
       spacialHash.insert(boids[0 + i * 4], boids[1 + i * 4], i * 4);
-    }
-    console.log(spacialHash);
+    }    
     for (a = 0; a < spacialHash.hashTable.length; a++) {
       for (let b = 0; b < spacialHash.hashTable[a].length; b++) {
         for (let c = 0; c < spacialHash.hashTable[a][b].length; c++) {
