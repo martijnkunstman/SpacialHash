@@ -235,7 +235,7 @@ function draw() {
           config.diameter
         );
       }
-    }``
+    }
   }
   fill(200);
   ctx.fillRect(0, 0, 180, 30);

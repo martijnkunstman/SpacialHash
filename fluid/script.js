@@ -1,10 +1,12 @@
 const CANVAS_WIDTH = 400;
 const CANVAS_HEIGHT = 400;
-const BOIDS_COUNT = 5000;
-const DIAMETER = 2;
-const GRAVITY = 0.005;
-const DAMPING = 0.995;
+const BOIDS_COUNT = 1000;
+const DIAMETER = 8;
+const GRAVITY = 0.004;
+const DAMPING = 0.99;
 const SEED = 123456;
+
+const USEHASH = true;
 
 const canvas = document.createElement("canvas");
 canvas.width = CANVAS_WIDTH;
@@ -33,32 +35,69 @@ function init() {
 }
 let imgData;
 function update() {
-  spacialHash.clear();
-  for (let i = 0; i < BOIDS_COUNT; i++) {
-    spacialHash.insert(boids[0 + i * 4], boids[1 + i * 4], i * 4);
-  }
   counter = 0;
   imgData = ctx.createImageData(CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  for (let i = 0; i < BOIDS_COUNT; i++) {
-    for (let j = 0; j < BOIDS_COUNT; j++) {
-      counter++;
-      if (i == j) continue;
-      let dx = boids[0 + i * 4] - boids[0 + j * 4];
-      let dy = boids[1 + i * 4] - boids[1 + j * 4];
-      let d = Math.sqrt(dx * dx + dy * dy);
-      if (d < DIAMETER * 2) {
-        let influence = 1 - d / (DIAMETER * 2);
-        //
-        let len = Math.sqrt(dx * dx + dy * dy);
-        dx /= len;
-        dy /= len;
-        //
-        boids[2 + i * 4] += (dx * influence) / 10;
-        boids[3 + i * 4] += (dy * influence) / 10;
+  if (USEHASH) {
+    spacialHash.clear();
+    for (let i = 0; i < BOIDS_COUNT; i++) {
+      spacialHash.insert(boids[0 + i * 4], boids[1 + i * 4], i * 4);
+    }
+    console.log(spacialHash);
+    for (a = 0; a < spacialHash.hashTable.length; a++) {
+      for (let b = 0; b < spacialHash.hashTable[a].length; b++) {
+        for (let c = 0; c < spacialHash.hashTable[a][b].length; c++) {
+          let i = spacialHash.hashTable[a][b][c];
+          let nextTo = neighbors(spacialHash.hashTable, a, b);
+          nextTo = [].concat(...nextTo);
+          for (cc = 0; cc < nextTo.length; cc++) {
+            //counter++;
+            //
+            if (i == nextTo[cc]) {
+              counter++;
+              continue;    
+            }        
+            let j = nextTo[cc];
+            let dx = boids[0 + i] - boids[0 + j];
+            let dy = boids[1 + i] - boids[1 + j];
+            let d = Math.sqrt(dx * dx + dy * dy);
+            if (d < DIAMETER * 2) {
+              let influence = 1 - d / (DIAMETER * 2);
+              //
+              let len = Math.sqrt(dx * dx + dy * dy);
+              dx /= len;
+              dy /= len;
+              //
+              boids[2 + i] += (dx * influence) / 10;
+              boids[3 + i] += (dy * influence) / 10;
+            }
+            //
+          }
+        }
+      }
+    }
+  } else {
+    for (let i = 0; i < BOIDS_COUNT; i++) {
+      for (let j = 0; j < BOIDS_COUNT; j++) {
+        counter++;
+        if (i == j) continue;
+        let dx = boids[0 + i * 4] - boids[0 + j * 4];
+        let dy = boids[1 + i * 4] - boids[1 + j * 4];
+        let d = Math.sqrt(dx * dx + dy * dy);
+        if (d < DIAMETER * 2) {
+          let influence = 1 - d / (DIAMETER * 2);
+          //
+          let len = Math.sqrt(dx * dx + dy * dy);
+          dx /= len;
+          dy /= len;
+          //
+          boids[2 + i * 4] += (dx * influence) / 10;
+          boids[3 + i * 4] += (dy * influence) / 10;
+        }
       }
     }
   }
+
   for (let i = 0; i < BOIDS_COUNT; i++) {
     //render boids position
     boids[2 + i * 4] = boids[2 + i * 4] * DAMPING;
