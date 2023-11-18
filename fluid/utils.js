@@ -57,7 +57,7 @@ class SpatialHash {
       }
       this.occupiedCells.length = 0; // Clear the occupiedCells array
     }
-    insert(x, y, i) {
+    insert(x, y, i) {      
       let xIndex = Math.floor(x / this.gridSize);
       let yIndex = Math.floor(y / this.gridSize);
       this.hashTable[yIndex][xIndex].push(i);

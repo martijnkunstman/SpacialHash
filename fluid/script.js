@@ -1,9 +1,9 @@
-const CANVAS_WIDTH = 400;
-const CANVAS_HEIGHT = 400;
-const BOIDS_COUNT = 1000;
-const DIAMETER = 8;
-const GRAVITY = 0.004;
-const DAMPING = 0.99;
+const CANVAS_WIDTH = 500;
+const CANVAS_HEIGHT = 500;
+const BOIDS_COUNT = 2000;
+const DIAMETER = 10;
+const GRAVITY = 0.005;
+const DAMPING = 0.95;
 const SEED = 123456;
 
 const USEHASH = true;
@@ -14,6 +14,8 @@ canvas.height = CANVAS_HEIGHT;
 document.body.appendChild(canvas);
 
 let spacialHash = new SpatialHash(CANVAS_WIDTH, CANVAS_HEIGHT, DIAMETER);
+
+let stop = false;
 
 const ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = true;
@@ -50,10 +52,9 @@ function update() {
           let nextTo = neighbors(spacialHash.hashTable, a, b);
           nextTo = [].concat(...nextTo);
           for (cc = 0; cc < nextTo.length; cc++) {
-            //counter++;
-            //
+            counter++;
             if (i == nextTo[cc]) {
-              counter++;
+              
               continue;    
             }        
             let j = nextTo[cc];
@@ -64,6 +65,7 @@ function update() {
               let influence = 1 - d / (DIAMETER * 2);
               //
               let len = Math.sqrt(dx * dx + dy * dy);
+              if (len<0.000001) len = 0.000001; //avoid division by zero
               dx /= len;
               dy /= len;
               //
@@ -134,7 +136,10 @@ function update() {
   ctx.putImageData(imgData, 0, 0);
   debugDiv.innerHTML =
     "FPS: " + Math.round(frameRate()) + " - counter: " + counter;
-  requestAnimationFrame(update);
+  if (!stop)
+  {
+    requestAnimationFrame(update);
+  }
 }
 
 init();
